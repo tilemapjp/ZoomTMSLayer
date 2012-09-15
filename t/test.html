@@ -1,0 +1,133 @@
+<html>
+    <head>
+        <meta charset="utf-8" />
+        
+        <link rel="stylesheet" href="https://raw.github.com/visionmedia/mocha/master/mocha.css" />
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+        <script src="https://raw.github.com/visionmedia/mocha/master/mocha.js"></script>
+        <script src="../lib/zoommaptile.js" type="text/javascript"></script>
+        <script>
+            mocha.setup('bdd');
+        </script>
+        <script>
+            describe('Object', function() {
+                describe('Construction', function() {
+                    function constructError(title,errordesc,options) {
+                        var e;
+                        try {
+                            e = errordesc ? {} : false;
+                            var obj = ZoomingTMS(options);
+                        } catch(err) {
+                            e = err;
+                        }
+                        it(title, function() {
+                            if (errordesc) {
+                                assert(e.message === errordesc);
+                            } else {
+                                assert(!errordesc);
+                            }
+                        });
+                    }
+                
+                    constructError('Throwing option error',              'Options are required.');
+                    constructError('Throwing url property error',        'Url property is required.',        {});                
+                    constructError('Throwing layername property error',  'Layername property is required.',  {
+                        url:        'http://www.finds.jp/ws/tms/',
+                    });
+                    constructError('Throwing tileMaxZoom property error','TileMaxZoom property is required.',{
+                        url:        'http://www.finds.jp/ws/tms/',
+                        layername : 'Kanto_Rapid-900913',
+                    });
+                    constructError('Construct success',                  false,                              {
+                        url:        'http://www.finds.jp/ws/tms/',
+                        layername : 'Kanto_Rapid-900913',
+                        tileMaxZoom: 17,
+                    });
+                });
+            });
+
+            describe('Property', function() {
+                describe('Default', function() {
+                    var obj = new ZoomingTMS({
+                        url:        'http://www.finds.jp/ws/tms/',
+                        layername : 'Kanto_Rapid-900913',
+                        tileMaxZoom: 17,
+                    });                
+
+                    it('maxZoom',        function() { assert(obj.maxZoom        === null); });
+                    it('minZoom',        function() { assert(obj.minZoom        === 0); });
+                    it('tileMaxZoom',    function() { assert(obj.tileMaxZoom    === 17); });
+                    it('tileSize',       function() { assert(obj.tileSize.width === 256 && obj.tileSize.height === 256); });
+                    it('name',           function() { assert(obj.name           === ''); });
+                    it('alt',            function() { assert(obj.alt            === ''); });
+                    it('url' ,           function() { assert(obj.url            === 'http://www.finds.jp/ws/tms/'); });
+                    it('serviceVersion', function() { assert(obj.serviceVersion === '1.0.0'); });                   
+                    it('layername' ,     function() { assert(obj.layername      === 'Kanto_Rapid-900913'); });
+                    it('type',           function() { assert(obj.type           === 'png'); }); 
+                });
+                describe('Override', function() {
+                    var obj = new ZoomingTMS({
+                        url:            'http://www.finds.jp/ws/tms/',
+                        layername :     'Tokyo5000-900913',
+                        tileMaxZoom:    16,
+                        maxZoom:        19,
+                        minZoom:        2,
+                        tileSize:       {width:100,height:100},
+                        name:           '東京 5000',
+                        alt:            '東京測量図原図',
+                        serviceVersion: '',
+                        type:           'jpg',
+                    });                
+
+                    it('maxZoom',        function() { assert(obj.maxZoom        === 19); });
+                    it('minZoom',        function() { assert(obj.minZoom        === 2); });
+                    it('tileMaxZoom',    function() { assert(obj.tileMaxZoom    === 16); });
+                    it('tileSize',       function() { assert(obj.tileSize.width === 100 && obj.tileSize.height === 100); });
+                    it('name',           function() { assert(obj.name           === '東京 5000'); });
+                    it('alt',            function() { assert(obj.alt            === '東京測量図原図'); });
+                    it('url' ,           function() { assert(obj.url            === 'http://www.finds.jp/ws/tms/'); });
+                    it('serviceVersion', function() { assert(obj.serviceVersion === ''); });                   
+                    it('layername' ,     function() { assert(obj.layername      === 'Tokyo5000-900913'); });
+                    it('type',           function() { assert(obj.type           === 'jpg'); }); 
+                });
+            });
+
+            describe('Method', function() {
+                describe('getTileUrl', function() {
+                    var obj = new ZoomingTMS({
+                        url:        'http://www.finds.jp/ws/tms/',
+                        layername : 'Kanto_Rapid-900913',
+                        tileMaxZoom: 17,
+                    });
+                    console.log(obj.getTileUrl({x:58214,y:25800},16));
+                    var case1 = (obj.getTileUrl({x:58214,y:25800},16) === 'http://www.finds.jp/ws/tms/1.0.0/Kanto_Rapid-900913/16/58214/25800.png');
+                    it('http://www.finds.jp/ws/tms/1.0.0/Kanto_Rapid-900913/16/58214/25800.png', function() { assert(case1); });
+                    
+                    obj.serviceVersion = '';
+                    console.log(obj.getTileUrl({x:14553,y:6449},14))
+                    var case2 = (obj.getTileUrl({x:14553,y:6449},14) === 'http://www.finds.jp/ws/tms/Kanto_Rapid-900913/14/14553/6449.png');
+                    it('http://www.finds.jp/ws/tms/Kanto_Rapid-900913/14/14553/6449.png', function() { assert(case2); });
+                });
+                describe('getTile', function() {
+                    it('Not writed yet. Pull requests are welcome.', function() { assert(true); });
+                });
+            });
+
+            var assert = function(expr, msg) {
+                if (!expr) throw new Error(msg || 'failed');
+            };
+            
+            assert.equal = function(a, b, msg) {
+                if (a !== b) throw new Error(msg || ('failed : '+a+','+b));
+            };
+            
+            $(function() {
+                mocha.run();
+            });
+            
+        </script>
+    </head>
+    <body>
+        <div id="mocha"></div>
+    </body>
+</html>
