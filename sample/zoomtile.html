@@ -27,7 +27,7 @@ var map;
 function init() {
   var map = new google.maps.Map(
       document.getElementById("map"), {
-        zoom: 8,
+        zoom: 15,
         center: new google.maps.LatLng(35.68721, 139.7704),
         mapTypeId: google.maps.MapTypeId.ROADMAP
       }
@@ -57,6 +57,7 @@ function init() {
 <body onload="init()">
 
 <div id="map" style='width:100%;height:600px;'></div>
+<p>利用: <a href="http://www.finds.jp/wsdocs/tmc/layers.html.ja">歴史的農業環境WMS配信サービス(関東平野)</a></p>
 <p>出典: <a href="http://habs.dc.affrc.go.jp/">歴史的農業環境閲覧システム</a></p>
 
 </body>
