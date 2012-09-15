@@ -2,25 +2,12 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/themes/smoothness/jquery-ui.css" type="text/css">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/jquery-ui.min.js" type="text/javascript"></script>
 <script src="http://maps.google.com/maps/api/js?sensor=false" type="text/javascript"></script>
 <script src="../lib/zoommaptile.js" type="text/javascript"></script>
 <script>
-var t5k = new ZoomingTMS({
-    url:         'http://www.finds.jp/ws/tms/',
-    layername :  'Tokyo5000-900913',
-    tileMaxZoom: 17,
-    maxZoom:     19,
-    name:        '東京 5000',
-    alt:         '東京測量図原図',
-});
-
-var rpd = new ZoomingTMS({
-    url:        'http://www.finds.jp/ws/tms/',
-    layername : 'Kanto_Rapid-900913',
-    tileMaxZoom: 17,
-    name:       '迅速測図',
-    alt:        '関東平野迅速測図',
-});
 
 var map;
 
@@ -32,9 +19,40 @@ function init() {
         mapTypeId: google.maps.MapTypeId.ROADMAP
       }
     );
+    
+  var t5k = new ZoomingTMS(map,{
+    url:         'http://www.finds.jp/ws/tms/',
+    layername :  'Tokyo5000-900913',
+    tileMaxZoom: 17,
+    maxZoom:     19,
+    name:        '東京 5000',
+    alt:         '東京測量図原図',
+  });
+
+  var rpd = new ZoomingTMS(map,{
+    url:        'http://www.finds.jp/ws/tms/',
+    layername : 'Kanto_Rapid-900913',
+    tileMaxZoom: 17,
+    name:       '迅速測図',
+    alt:        '関東平野迅速測図',
+  });    
+    
   map.overlayMapTypes.insertAt(0, rpd);
   map.overlayMapTypes.insertAt(1, t5k);
 
+  var layers = {
+    'rapid' : rpd,
+    'tky5k' : t5k,
+  };
+
+  $(".slider").slider({
+    value: 100,
+    slide: function(e, ui) {
+        var key = $(this).attr('id');
+        
+        layers[key].setOpacity(ui.value);
+    }
+  });
 }
 
 </script>
@@ -50,13 +68,19 @@ function init() {
   background: #fff;
 }
 
+.slider {
+    width: 492px;
+    margin: 10px;
+}
 
 </style>
 
 </head>
 <body onload="init()">
 
-<div id="map" style='width:100%;height:600px;'></div>
+<div id="map" style='width:100%;height:500px;'></div>
+関東平野迅速測図:(透過度) <div id="rapid" class="slider"><div class="ui-slider-handle"></div></div>
+東京測量図原図:(透過度) <div id="tky5k" class="slider"><div class="ui-slider-handle"></div></div>
 <p>利用: <a href="http://www.finds.jp/wsdocs/tmc/layers.html.ja">歴史的農業環境WMS配信サービス(関東平野)</a></p>
 <p>出典: <a href="http://habs.dc.affrc.go.jp/">歴史的農業環境閲覧システム</a></p>
 
