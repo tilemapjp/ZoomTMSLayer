@@ -1,0 +1,10 @@
+v0.1.0
++ Change filename and classname, fix some bugs.
++ Add Leaflet version, but somewhat dirty and heavy.
+
+v0.0.2
++ Refact based on based on Gavin Harriss's CustomTileOverlay.js
+  http://www.gavinharriss.com/code/opacity-control
+
+v0.0.1
++ Initial commit

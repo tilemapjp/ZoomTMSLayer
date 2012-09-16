@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/themes/smoothness/jquery-ui.css" type="text/css">
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.css" />
+<!--[if lte IE 8]>
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.ie.css" />
+<![endif]-->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/jquery-ui.min.js" type="text/javascript"></script>
+<script src="http://cdn.leafletjs.com/leaflet-0.4/leaflet.js"></script>
+<script src="../lib/L.zoomTMSLayer.js" type="text/javascript"></script>
+<script>
+
+var map;
+
+function init() {
+  var map = L.map('map').setView([35.68721, 139.7704], 15);
+
+  L.zoomTMSLayer({
+	url:            'http://tile.openstreetmap.org/',
+	layername :     '',
+	serviceVersion: '',
+	attribution:    '&copy;<a href="http://creativecommons.org/licenses/by-sa/2.0/">CCBYSA</a> 2010 <a href="http://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+	tileMaxZoom:    17,
+	maxZoom:        20,
+	tms:            false,
+  }).addTo(map);
+
+  var rpd = L.zoomTMSLayer({
+	url:         'http://www.finds.jp/ws/tms/',
+	layername :  'Kanto_Rapid-900913',
+	tileMaxZoom: 17,
+	maxZoom:     20,
+	name:        '迅速測図',
+	alt:         '関東平野迅速測図',
+	attribution: '&copy;<a href="http://www.finds.jp/wsdocs/tmc/layers.html.ja">歴史的農業環境WMS配信サービス</a>',
+  }); 
+  rpd.addTo(map);
+
+  var t5k = L.zoomTMSLayer({
+	url:         'http://www.finds.jp/ws/tms/',
+	layername :  'Tokyo5000-900913',
+	tileMaxZoom: 17,
+	maxZoom:     19,
+	name:        '東京 5000',
+	alt:         '東京測量図原図',
+	attribution: '&copy;<a href="http://www.finds.jp/wsdocs/tmc/layers.html.ja">歴史的農業環境WMS配信サービス</a>',
+  });
+  t5k.addTo(map);
+
+  var layers = {
+	'rapid' : rpd,
+	'tky5k' : t5k,
+  };
+
+  $(".slider").slider({
+	value: 100,
+	slide: function(e, ui) {
+		var key = $(this).attr('id');
+		
+		layers[key].setOpacity(ui.value/100);
+	}
+  }); 
+}
+
+</script>
+<style type="text/css">
+#map {
+  width: 100%;
+  height: 500px;
+  border: solid 1px #999;
+}
+
+#map #copyright {
+  padding: 2px;
+  background: #fff;
+}
+
+.slider {
+	width: 492px;
+	margin: 10px;
+}
+
+</style>
+
+</head>
+<body onload="init()">
+
+<div id="map"></div>
+関東平野迅速測図:(透過度) <div id="rapid" class="slider"><div class="ui-slider-handle"></div></div>
+東京測量図原図:(透過度) <div id="tky5k" class="slider"><div class="ui-slider-handle"></div></div>
+<p>利用: <a href="http://www.finds.jp/wsdocs/tmc/layers.html.ja">歴史的農業環境WMS配信サービス(関東平野)</a></p>
+<p>出典: <a href="http://habs.dc.affrc.go.jp/">歴史的農業環境閲覧システム</a></p>
+
+</body>
+</html>
