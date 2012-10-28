@@ -1,3 +1,6 @@
+v0.1.1
++ Solving issue about detectRetina
+
 v0.1.0
 + Change filename and classname, fix some bugs.
 + Add Leaflet version, but somewhat dirty and heavy.
